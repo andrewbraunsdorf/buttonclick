@@ -2,10 +2,16 @@ console.log('Server-side code running');
 
 const express = require('express');
 const MongoClient = require('mongodb').MongoClient;
+const mongoose = require('mongoose');
 const app = express();
 
 // serve files from the public directory
 app.use(express.static('public'));
+
+
+// connect to the mongodb database using mongoose
+mongoose.connect('mongodb://localhost/employee', { useNewUrlParser: true });
+mongoose.Promise = global.Promise;
 
 // connect to the db and start the express server
 let db;
@@ -42,5 +48,14 @@ app.post('/clicked', (req, res) => {
     }
     console.log('click added to db');
     res.sendStatus(201);
+  });
+});
+
+// get the click data from the database
+app.get('/clicks', (req, res) => {
+
+  db.collection('clicks').find().toArray((err, result) => {
+    if (err) return console.log(err);
+    res.send(result);
   });
 });
